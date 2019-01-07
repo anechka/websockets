@@ -14,6 +14,7 @@
   "author": "Andrey Menangen",
   "license": "MIT",
   "dependencies": {
+    "inquirer": "^6.2.1",
     "ws": "^6.1.2"
   }
 }

@@ -1,16 +1,47 @@
 const PORT = 8080;
 
-const WebSocket = require('ws');
+const inquirer = require("inquirer");
+
+const WebSocket = require("ws");
 const wss = new WebSocket.Server({ port: PORT });
 
-wss.on('connection', function connection(wsConnection) {
+async function prompt(wsConnection) {
+    let chatCommand;
 
-    wsConnection.on('message', function incoming(message) {
-        console.log('received: %s', message);
+    const questions = [
+        {
+            type: "input",
+            name: "chat",
+            message: "Text to send (or type <exit> for exit)"
+        }
+    ];
+
+    return await
+                inquirer
+                        .prompt(questions)
+                        .then(answers => {
+
+                            chatCommand = answers.chat;
+                            wsConnection.send(chatCommand);
+
+                            return chatCommand
+                        });
+}
+
+wss.on("connection", async function connection(wsConnection) {
+
+
+    wsConnection.on("message", function incoming(message) {
+        console.log("\nreceived: %s\n", message);
     });
 
-    wsConnection.send('buratino');
+    let inputText = "";
 
+    while (inputText !== "exit") {
+        inputText = await prompt(wsConnection)
+    }
+
+    process.exit()
 });
 
 console.log(`Starting on port ${PORT}`);
