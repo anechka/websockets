@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vue websocket</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css">
+</head>
+
+<template id="rootComponent" type="text/x-template">
+    <div class="container">
+        <div class="notification">
+            This container is <strong>centered</strong> on desktop.
+        </div>
+    </div>
+</template>
+
+<body>
+
+    <app name="app"></app>
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
+
+    <script>
+        const rootComponent = {
+            el: "app",
+            template: "#rootComponent",
+            created() {
+                console.log("Root mounted");
+
+                try {
+                    console.log("Opening socket");
+                    const socket = new WebSocket('ws://localhost:8080');
+
+                    try {
+                        socket.onopen = function (event) {
+
+                            console.log('Connected to: ' + event.currentTarget.url);
+                            /*
+                            socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.url;
+                            socketStatus.className = 'open';
+                            */
+                        };
+
+                        socket.onerror = function(error) {
+                            console.error('WebSocket Error: ' + error);
+                        };
+
+                        socket.onmessage = (event) => {
+                            const message = event.data;
+                            console.info(message);
+
+                            socket.send("Hello from browser");
+                        };
+
+                    } catch (e) {
+                        console.error(e.message)
+                    }
+
+                } catch (e) {
+                    console.error(e.message)
+                }
+            }
+        };
+
+        const app = new Vue(rootComponent);
+    </script>
+
+</body>
+
+</html>
