@@ -9,8 +9,8 @@
 
 <template id="rootComponent" type="text/x-template">
     <div class="container">
-        <div class="notification">
-            This container is <strong>centered</strong> on desktop.
+        <div class="notification" v-for="logEntry in logContainer">
+            {{ logEntry }}
         </div>
     </div>
 </template>
@@ -25,30 +25,36 @@
         const rootComponent = {
             el: "app",
             template: "#rootComponent",
+            data: { logContainer: [] },
             created() {
                 console.log("Root mounted");
+
+                const Log = message => {
+                    this.logContainer.push(message)
+                };
 
                 try {
                     console.log("Opening socket");
                     const socket = new WebSocket('ws://localhost:8080');
 
                     try {
-                        socket.onopen = function (event) {
+                        socket.onopen = event => {
 
                             console.log('Connected to: ' + event.currentTarget.url);
-                            /*
-                            socketStatus.innerHTML = 'Connected to: ' + event.currentTarget.url;
-                            socketStatus.className = 'open';
-                            */
+
+                            Log('Connected to: ' + event.currentTarget.url);
+
                         };
 
-                        socket.onerror = function(error) {
+                        socket.onerror = error => {
                             console.error('WebSocket Error: ' + error);
+                            Log(error)
                         };
 
-                        socket.onmessage = (event) => {
+                        socket.onmessage = event => {
                             const message = event.data;
                             console.info(message);
+                            Log(message);
 
                             socket.send("Hello from browser");
                         };

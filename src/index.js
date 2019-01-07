@@ -3,13 +3,13 @@ const PORT = 8080;
 const WebSocket = require('ws');
 const wss = new WebSocket.Server({ port: PORT });
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(wsConnection) {
 
-    ws.on('message', function incoming(message) {
+    wsConnection.on('message', function incoming(message) {
         console.log('received: %s', message);
     });
 
-    ws.send('buratino');
+    wsConnection.send('buratino');
 
 });
 
